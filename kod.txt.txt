@@ -1,0 +1,78 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>  // Для abs
+
+using namespace std;
+
+// Функция для проверки ввода натурального числа
+int getPositiveInteger(const string& prompt) {
+    int value;
+    while (true) {
+        cout « prompt;
+        cin » value;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout « "Ошибка: введите натуральное целое число." « endl;
+        } else if (value <= 0) {
+            cout « "Ошибка: введите натуральное целое число больше 0." « endl;
+        } else {
+            return value;
+        }
+    }
+}
+
+int main() {
+    // Запрос количества домов от пользователя
+    int numHouses = getPositiveInteger("Введите количество домов, к которым нужно подключить интернет (натуральное число): ");
+
+    // Вектор для хранения позиций домов
+    vector<int> housePositions(numHouses);
+
+    // Запрос позиций домов для проведения интернета
+    for (int i = 0; i < numHouses; ++i) {
+        cout « "Введите позицию дома #" « (i + 1) « ": ";
+        cin » housePositions[i];
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout « "Ошибка: введите натуральное целое число." « endl;
+            —i;  // Повторить ввод для текущего дома
+        }
+    }
+
+    // Сортируем позиции домов
+    sort(housePositions.begin(), housePositions.end());
+
+    // Находим медианную позицию
+    int medianIndex = numHouses / 2;
+    vector<int> optimalPositions;
+
+    if (numHouses % 2 == 0) {
+        // Если количество домов четное, выбираем две средние позиции
+        int median1 = housePositions[medianIndex - 1];
+        int median2 = housePositions[medianIndex];
+
+        // Все позиции между median1 и median2 включительно
+        for (int pos = median1; pos <= median2; ++pos) {
+            optimalPositions.push_back(pos);
+        }
+    } else {
+        // Если количество домов нечетное, медиана — это средний элемент
+        optimalPositions.push_back(housePositions[medianIndex]);
+    }
+
+    // Вычисляем общую длину кабеля для каждой оптимальной позиции
+    for (int optimalPosition : optimalPositions) {
+        int totalCableLength = 0;
+        for (int i = 0; i < numHouses; ++i) {
+            totalCableLength += abs(housePositions[i] - optimalPosition);
+        }
+
+        // Выводим оптимальную позицию для установки коммутатора и общую длину кабеля
+        cout « "Оптимальная позиция для установки коммутатора: " « optimalPosition « ", Общая длина кабеля: " « totalCableLength « endl;
+    }
+
+    return 0;
+}
